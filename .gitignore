@@ -1,0 +1,14 @@
+# Java
+
+*.class
+*.jar
+target/
+bin/
+.env
+*.ear
+*.war
+build/
+*.iml
+Desktop.ini
+*.log
+.gradle/

@@ -59,4 +59,26 @@ class EnvironmentConfigTest {
         assertEquals(c1, c2);
         assertEquals(c1.hashCode(), c2.hashCode());
     }
+
+    @Test
+    void shouldReturnNullForMissingVariable() {
+        EnvironmentConfig config = new EnvironmentConfig("dev", "us-east-1", "dev-ns",
+                Map.of("EXISTING_KEY", "value"));
+
+        assertNull(config.getVariable("NON_EXISTENT_KEY"));
+    }
+
+    @Test
+    void shouldNotMutateInternalStateFromOriginalMap() {
+        Map<String, String> vars = new HashMap<>();
+        vars.put("KEY", "original");
+        EnvironmentConfig config = new EnvironmentConfig("prod", "us-west-2", "prod-ns", vars);
+
+        // Mutate the original map after construction
+        vars.put("NEW_KEY", "injected");
+        vars.put("KEY", "modified");
+
+        assertEquals("original", config.getVariable("KEY"));
+        assertNull(config.getVariable("NEW_KEY"));
+    }
 }

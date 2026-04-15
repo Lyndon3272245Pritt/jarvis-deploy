@@ -71,4 +71,22 @@ class ConfigLoaderTest {
         Optional<EnvironmentConfig> result = classpathLoader.load("nonexistent-env");
         assertFalse(result.isPresent());
     }
+
+    @Test
+    void load_returnsConfig_withDefaultValues_whenOptionalFieldsAbsent() throws IOException {
+        // Verifies that a minimal YAML file (only required fields) does not cause
+        // a parse error and that optional numeric/boolean fields use their defaults.
+        String yaml = "environment: prod\n"
+                + "region: eu-west-1\n";
+        Files.writeString(tempDir.resolve("prod.yaml"), yaml);
+
+        Optional<EnvironmentConfig> result = loader.load("prod");
+
+        assertTrue(result.isPresent());
+        EnvironmentConfig config = result.get();
+        assertEquals("prod", config.getEnvironment());
+        assertEquals("eu-west-1", config.getRegion());
+        assertEquals(1, config.getReplicas());  // expected default
+        assertFalse(config.isDebug());           // expected default
+    }
 }

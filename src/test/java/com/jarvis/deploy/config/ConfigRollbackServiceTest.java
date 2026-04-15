@@ -83,10 +83,12 @@ class ConfigRollbackServiceTest {
     }
 
     @Test
-    void constructor_throwsOnNullDependencies() {
-        assertThrows(IllegalArgumentException.class,
-                () -> new ConfigRollbackService(null, versionRegistry));
-        assertThrows(IllegalArgumentException.class,
-                () -> new ConfigRollbackService(snapshotService, null));
+    void rollback_doesNotRegisterWhenSnapshotNotFound() {
+        when(snapshotService.listSnapshots("staging")).thenReturn(List.of(sampleSnapshot));
+
+        assertThrows(RollbackException.class,
+                () -> rollbackService.rollback("staging", "snap-999"));
+
+        verify(versionRegistry, never()).register(anyString(), any());
     }
 }

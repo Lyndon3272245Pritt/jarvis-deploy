@@ -62,6 +62,17 @@ class ConfigImportServiceTest {
     }
 
     @Test
+    void importStringAndRegister_emptyContent_returnsEmptyProperties() throws Exception {
+        EnvironmentConfig config = service.importStringAndRegister(
+                "", "staging", ConfigImporter.ImportFormat.ENV, "alice");
+
+        assertNotNull(config);
+        assertTrue(config.getProperties().isEmpty(),
+                "Expected no properties for empty input");
+        verify(versionRegistry, times(1)).register(eq("staging"), eq(config), eq("alice"));
+    }
+
+    @Test
     void constructor_nullImporter_throwsNullPointerException() {
         assertThrows(NullPointerException.class,
                 () -> new ConfigImportService(null, versionRegistry));

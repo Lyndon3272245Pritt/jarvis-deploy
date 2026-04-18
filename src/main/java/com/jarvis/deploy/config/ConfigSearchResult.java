@@ -14,6 +14,12 @@ public class ConfigSearchResult {
     private final int totalMatches;
 
     public ConfigSearchResult(String environment, Map<String, String> matchedEntries) {
+        if (environment == null) {
+            throw new IllegalArgumentException("environment must not be null");
+        }
+        if (matchedEntries == null) {
+            throw new IllegalArgumentException("matchedEntries must not be null");
+        }
         this.environment = environment;
         this.matchedEntries = Collections.unmodifiableMap(matchedEntries);
         this.totalMatches = matchedEntries.size();

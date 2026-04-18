@@ -3,6 +3,8 @@ package com.jarvis.deploy.config;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Represents a structured comparison report between two environments.
@@ -53,5 +55,15 @@ public class ConfigCompareReport {
 
     public boolean hasChanges() {
         return entries.stream().anyMatch(e -> e.getDiffType() != DiffType.UNCHANGED);
+    }
+
+    /**
+     * Returns a summary map of entry counts grouped by diff type.
+     *
+     * @return a map from DiffType to the number of entries with that type
+     */
+    public Map<DiffType, Long> getSummary() {
+        return entries.stream()
+                .collect(Collectors.groupingBy(Entry::getDiffType, Collectors.counting()));
     }
 }

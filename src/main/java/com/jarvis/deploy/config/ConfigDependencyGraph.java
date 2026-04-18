@@ -33,6 +33,39 @@ public class ConfigDependencyGraph {
     }
 
     /**
+     * Returns all environments that directly or transitively depend on the given environment.
+     * Useful for determining what needs to be redeployed when a config changes.
+     *
+     * @param env the environment whose dependents should be found
+     * @return set of environment names that depend on the given environment
+     */
+    public Set<String> getTransitiveDependents(String env) {
+        if (!adjacency.containsKey(env)) {
+            throw new IllegalArgumentException("Unknown environment: " + env);
+        }
+        Set<String> dependents = new LinkedHashSet<>();
+        for (String candidate : adjacency.keySet()) {
+            if (!candidate.equals(env)) {
+                collectDependents(candidate, env, dependents, new HashSet<>());
+            }
+        }
+        return Collections.unmodifiableSet(dependents);
+    }
+
+    private boolean collectDependents(String current, String target, Set<String> dependents, Set<String> visited) {
+        if (!visited.add(current)) {
+            return dependents.contains(current);
+        }
+        for (String dep : adjacency.getOrDefault(current, Collections.emptySet())) {
+            if (dep.equals(target) || collectDependents(dep, target, dependents, visited)) {
+                dependents.add(current);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Returns environments in topological order (dependencies first).
      * Throws ConfigDependencyCycleException if a cycle is detected.
      */
